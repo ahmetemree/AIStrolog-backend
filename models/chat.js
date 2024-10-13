@@ -5,6 +5,10 @@ const chatSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    chatId:{
+        type:String,
+        required:true
+    },
 history:[
     {
         role:{
