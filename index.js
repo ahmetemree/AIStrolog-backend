@@ -32,9 +32,12 @@ const connect = async () => {
   }
 };
 
-app.get("/getchats", async (req, res) => {
+app.post("/getchats", async (req, res,) => {
+  
+  const { userId } = req.body;
+  console.log(userId);
   try {
-    const userChats = await UserChats.find();
+    const userChats = await UserChats.find({ userId: userId });
     res.status(200).json(userChats);
     
   } catch (error) {
@@ -46,8 +49,7 @@ app.get("/getchats", async (req, res) => {
 
 app.post("/createchat", async (req, res) => {
   const { userId, chatId, title, history } = req.body;
-  console.log("backende geldi veriler yok");
-  console.log(userId, chatId, title, history);
+  
   const newChat = new UserChats({
     userId,
     chats: [{
@@ -63,7 +65,7 @@ app.post("/createchat", async (req, res) => {
   });
   try {
     const savedChat = await newChat.save();
-    console.log("chat saveledi");
+    
     const savedDetailedChat = await newDetailedChat.save();
     
     res.status(201).json(savedChat);
@@ -74,9 +76,12 @@ app.post("/createchat", async (req, res) => {
 });
 
 app.post("/getchat/:chatId", async (req, res) => {
+  
   const { chatId } = req.params;
+  console.log("chatId:",chatId);
   try {
     const chat = await Chat.findOne({ chatId: chatId });
+    console.log("chat:",chat);
     res.status(200).json(chat);
   } catch (error) {
     res.status(500).json({ message: "Failed to get chat" });
@@ -84,8 +89,8 @@ app.post("/getchat/:chatId", async (req, res) => {
 });
 
 app.put("/updatechat/:chatId", async (req, res) => {
+  const { role,parts,chatId } = req.body;
   
-  const { chatId,role,parts } = req.body;
   try {
     await Chat.findOneAndUpdate(
       { chatId: chatId },
@@ -97,6 +102,10 @@ app.put("/updatechat/:chatId", async (req, res) => {
     res.status(500).json({ message: "Failed to update chat" });
   }
 });
+
+
+
+
 app.delete("/deletechat/:chatId", async (req, res) => {
   const { chatId } = req.params;
   try {
