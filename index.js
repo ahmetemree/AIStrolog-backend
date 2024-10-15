@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import 'dotenv/config'
 import UserChats from "./models/userChat.js";
 import { ClerkExpressRequireAuth, ClerkExpressWithAuth } from '@clerk/clerk-sdk-node'
+import { clerkMiddleware, requireAuth } from '@clerk/express'
 import Chat from "./models/chat.js";
 const app = express();
 const port = 3002;
@@ -31,10 +32,23 @@ const connect = async () => {
     console.log(err);
   }
 };
+app.use(clerkMiddleware())
 
-app.post("/getchats", async (req, res,) => {
+app.get("/deneme",requireAuth({signInUrl:'/sign-in'}), async (req, res,) => {
+  res.send("deneme");
+});
+
+app.get('/sign-in', (req, res) => {
+  // Assuming you have a template engine installed and are using a Clerk JavaScript SDK on this page
+  res.redirect(process.env.CLIENT_URL + '/login')
+})
+
+app.get("/getchats", requireAuth({signInUrl:'/sign-in'}), async (req, res,) => {
   
-  const { userId } = req.body;
+    const userId = req.auth.userId;
+    if (!userId) {
+      return res.status(401).json({ message: "Kullanıcı kimliği doğrulanamadı" });
+    }
   console.log(userId);
   try {
     const userChats = await UserChats.find({ userId: userId });
@@ -47,9 +61,9 @@ app.post("/getchats", async (req, res,) => {
 
 
 
-app.post("/createchat", async (req, res) => {
-  const { userId, chatId, title, history } = req.body;
-  
+app.post("/createchat", requireAuth({signInUrl:'/sign-in'}), async (req, res) => {
+  const { chatId, title, history } = req.body;
+  const userId = req.auth.userId;
   const newChat = new UserChats({
     userId,
     chats: [{
@@ -75,12 +89,13 @@ app.post("/createchat", async (req, res) => {
   }
 });
 
-app.post("/getchat/:chatId", async (req, res) => {
+app.post("/getchat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, res) => {
   
   const { chatId } = req.params;
+  const userId = req.auth.userId;
   console.log("chatId:",chatId);
   try {
-    const chat = await Chat.findOne({ chatId: chatId });
+    const chat = await Chat.findOne({ chatId: chatId, userId: userId });
     console.log("chat:",chat);
     res.status(200).json(chat);
   } catch (error) {
@@ -88,12 +103,13 @@ app.post("/getchat/:chatId", async (req, res) => {
   }
 });
 
-app.put("/updatechat/:chatId", async (req, res) => {
+app.put("/updatechat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, res) => {
   const { role,parts,chatId } = req.body;
+  const userId = req.auth.userId;
   
   try {
     await Chat.findOneAndUpdate(
-      { chatId: chatId },
+      { chatId: chatId, userId: userId },
       { $push: { history: { role: role, parts: parts } } },
       { new: true }
     );
@@ -106,10 +122,11 @@ app.put("/updatechat/:chatId", async (req, res) => {
 
 
 
-app.delete("/deletechat/:chatId", async (req, res) => {
+app.delete("/deletechat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, res) => {
   const { chatId } = req.params;
+  const userId = req.auth.userId;
   try {
-    await UserChats.findOneAndDelete({ "chats._id": chatId });
+    await UserChats.findOneAndDelete({ "chats._id": chatId, userId: userId });
     await Chat.findOneAndDelete({ chatId: chatId });
     const userChats = await UserChats.find();
     res.status(200).json(userChats);
