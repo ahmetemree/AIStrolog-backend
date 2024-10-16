@@ -106,6 +106,7 @@ app.post("/getchat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, re
 app.put("/updatechat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, res) => {
   const { role,parts,chatId } = req.body;
   const userId = req.auth.userId;
+  console.log("userIddavam:",userId);
   
   try {
     await Chat.findOneAndUpdate(
