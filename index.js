@@ -19,8 +19,7 @@ app.use(
   cors({
     origin: process.env.CLIENT_URL,
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
   })
 );
 
@@ -35,8 +34,6 @@ const connect = async () => {
   }
 };
 app.use(clerkMiddleware())
-
-app.use(requireAuth());
 
 app.get("/deneme",requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res,) => {
   res.send("deneme");
