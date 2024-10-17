@@ -36,7 +36,7 @@ const connect = async () => {
 };
 app.use(clerkMiddleware())
 
-app.get("/deneme",requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res,) => {
+app.get("/deneme",ClerkExpressRequireAuth(), async (req, res,) => {
   res.send("deneme");
 });
 
@@ -45,7 +45,7 @@ app.get('/sign-in', (req, res) => {
   res.redirect(process.env.CLIENT_URL + '/login')
 })
 
-app.get("/getchats", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res,) => {
+app.get("/getchats", ClerkExpressRequireAuth(), async (req, res,) => {
   
     const userId = req.auth.userId;
     if (!userId) {
@@ -63,7 +63,7 @@ app.get("/getchats", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'
 
 
 
-app.post("/createchat", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
+app.post("/createchat", ClerkExpressRequireAuth(), async (req, res) => {
   const { chatId, title, history } = req.body;
   const userId = req.auth.userId;
   const newChat = new UserChats({
@@ -91,7 +91,7 @@ app.post("/createchat", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-
   }
 });
 
-app.post("/getchat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
+app.post("/getchat/:chatId", ClerkExpressRequireAuth(), async (req, res) => {
   
   const { chatId } = req.params;
   const userId = req.auth.userId;
@@ -105,7 +105,7 @@ app.post("/getchat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + '/
   }
 });
 
-app.put("/updatechat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
+app.put("/updatechat/:chatId", ClerkExpressRequireAuth(), async (req, res) => {
   const { role,parts,chatId } = req.body;
   const userId = req.auth.userId;
   console.log("userIddavam:",userId);
@@ -125,7 +125,7 @@ app.put("/updatechat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + 
 
 
 
-app.delete("/deletechat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
+app.delete("/deletechat/:chatId", ClerkExpressRequireAuth(), async (req, res) => {
   const { chatId } = req.params;
   const userId = req.auth.userId;
   try {
