@@ -19,6 +19,7 @@ app.use(
   cors({
     origin: process.env.CLIENT_URL,
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
   })
 );
 
@@ -34,7 +35,7 @@ const connect = async () => {
 };
 app.use(clerkMiddleware())
 
-app.get("/deneme",requireAuth({signInUrl:'/sign-in'}), async (req, res,) => {
+app.get("/deneme",requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res,) => {
   res.send("deneme");
 });
 
@@ -43,7 +44,7 @@ app.get('/sign-in', (req, res) => {
   res.redirect(process.env.CLIENT_URL + '/login')
 })
 
-app.get("/getchats", requireAuth({signInUrl:'/sign-in'}), async (req, res,) => {
+app.get("/getchats", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res,) => {
   
     const userId = req.auth.userId;
     if (!userId) {
@@ -61,7 +62,7 @@ app.get("/getchats", requireAuth({signInUrl:'/sign-in'}), async (req, res,) => {
 
 
 
-app.post("/createchat", requireAuth({signInUrl:'/sign-in'}), async (req, res) => {
+app.post("/createchat", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
   const { chatId, title, history } = req.body;
   const userId = req.auth.userId;
   const newChat = new UserChats({
@@ -89,7 +90,7 @@ app.post("/createchat", requireAuth({signInUrl:'/sign-in'}), async (req, res) =>
   }
 });
 
-app.post("/getchat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, res) => {
+app.post("/getchat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
   
   const { chatId } = req.params;
   const userId = req.auth.userId;
@@ -103,7 +104,7 @@ app.post("/getchat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, re
   }
 });
 
-app.put("/updatechat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, res) => {
+app.put("/updatechat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
   const { role,parts,chatId } = req.body;
   const userId = req.auth.userId;
   console.log("userIddavam:",userId);
@@ -123,7 +124,7 @@ app.put("/updatechat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, 
 
 
 
-app.delete("/deletechat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, res) => {
+app.delete("/deletechat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
   const { chatId } = req.params;
   const userId = req.auth.userId;
   try {
