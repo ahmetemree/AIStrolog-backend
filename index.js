@@ -36,7 +36,7 @@ const connect = async () => {
 };
 app.use(clerkMiddleware())
 
-app.get("/deneme",ClerkExpressRequireAuth({ authorizedParties: process.env.CLIENT_URL }), async (req, res,) => {
+app.get("/deneme",ClerkExpressRequireAuth(), async (req, res,) => {
   res.send("deneme");
 });
 
@@ -45,24 +45,19 @@ app.get('/sign-in', (req, res) => {
   res.redirect(process.env.CLIENT_URL + '/login')
 })
 
-app.get("/getchats", ClerkExpressRequireAuth(), async (req, res) => {
-  try {
+app.get("/getchats", ClerkExpressRequireAuth(), async (req, res,) => {
+  console.log(req.auth);
     const userId = req.auth.userId;
     if (!userId) {
-      console.error("Clerk hatası: Kullanıcı kimliği bulunamadı");
       return res.status(401).json({ message: "Kullanıcı kimliği doğrulanamadı" });
     }
-    console.log("Kullanıcı kimliği:", userId);
-
+  console.log(userId);
+  try {
     const userChats = await UserChats.find({ userId: userId });
     res.status(200).json(userChats);
+    
   } catch (error) {
-    console.error("Clerk veya veritabanı hatası:", error);
-    if (error.name === 'ClerkError') {
-      console.error("Clerk özel hatası:", error.message);
-      return res.status(401).json({ message: "Kimlik doğrulama hatası: " + error.message });
-    }
-    res.status(500).json({ message: "Kullanıcı sohbetleri alınamadı", error: error.message });
+    res.status(500).json({ message: "Failed to fetch user chats" });
   }
 });
 
@@ -100,8 +95,10 @@ app.post("/getchat/:chatId", ClerkExpressRequireAuth(), async (req, res) => {
   
   const { chatId } = req.params;
   const userId = req.auth.userId;
+  console.log("chatId:",chatId);
   try {
     const chat = await Chat.findOne({ chatId: chatId, userId: userId });
+    console.log("chat:",chat);
     res.status(200).json(chat);
   } catch (error) {
     res.status(500).json({ message: "Failed to get chat" });
@@ -111,6 +108,7 @@ app.post("/getchat/:chatId", ClerkExpressRequireAuth(), async (req, res) => {
 app.put("/updatechat/:chatId", ClerkExpressRequireAuth(), async (req, res) => {
   const { role,parts,chatId } = req.body;
   const userId = req.auth.userId;
+  console.log("userIddavam:",userId);
   
   try {
     await Chat.findOneAndUpdate(
