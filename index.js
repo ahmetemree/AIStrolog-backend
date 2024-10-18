@@ -46,7 +46,7 @@ app.get('/sign-in', (req, res) => {
 })
 
 app.get("/getchats", ClerkExpressRequireAuth(), async (req, res,) => {
-  console.log(req.auth);
+  console.log("engrdersi : ", req.auth);
     const userId = req.auth.userId;
     if (!userId) {
       return res.status(401).json({ message: "Kullanıcı kimliği doğrulanamadı" });
