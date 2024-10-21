@@ -93,8 +93,10 @@ app.post("/getchat/:chatId",ClerkExpressWithAuth(), async (req, res) => {
   
   const { chatId } = req.params;
   const userId = req.auth.userId;
+  console.log("getchatuserId:" ,userId , "chatId:" ,chatId);
+
   try {
-    const chat = await Chat.findOne({ chatId: chatId, userId: userId });
+    const chat = await Chat.findOne({ chatId: chatId });
     res.status(200).json(chat);
   } catch (error) {
     res.status(500).json({ message: "Failed to get chat" });
@@ -104,10 +106,10 @@ app.post("/getchat/:chatId",ClerkExpressWithAuth(), async (req, res) => {
 app.put("/updatechat/:chatId",ClerkExpressWithAuth(), async (req, res) => {
   const { role,parts,chatId } = req.body;
   const userId = req.auth.userId;
-  
+  console.log("updatechatuserId:" ,userId , "chatId:" ,chatId);
   try {
     await Chat.findOneAndUpdate(
-      { chatId: chatId, userId: userId },
+      { chatId: chatId },
       { $push: { history: { role: role, parts: parts } } },
       { new: true }
     );
@@ -124,7 +126,7 @@ app.delete("/deletechat/:chatId",ClerkExpressWithAuth(), async (req, res) => {
   const { chatId } = req.params;
   const userId = req.auth.userId;
   try {
-    await UserChats.findOneAndDelete({ "chats._id": chatId, userId: userId });
+    await UserChats.findOneAndDelete({ "chats._id": chatId });
     await Chat.findOneAndDelete({ chatId: chatId });
     const userChats = await UserChats.find();
     res.status(200).json(userChats);
