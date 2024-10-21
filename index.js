@@ -34,9 +34,9 @@ const connect = async () => {
     console.log(err);
   }
 };
-app.use(clerkMiddleware())
+app.use(clerkMiddleware({domain:process.env.CLIENT_URL}))
 
-app.get("/deneme",requireAuth({signInUrl:'/sign-in'}), async (req, res,) => {
+app.get("/deneme",requireAuth({secretKey:process.env.CLERK_SECRET_KEY,publishableKey:process.env.CLERK_PUBLISHABLE_KEY,domain:"https://aistrolog-backend.onrender.com/"}), async (req, res,) => {
 
   res.send("deneme");
 });
@@ -46,7 +46,7 @@ app.get('/sign-in', (req, res) => {
   res.redirect(process.env.CLIENT_URL + '/login')
 })
 
-app.get("/getchats", requireAuth({signInUrl:'/sign-in'}), async (req, res,) => {
+app.get("/getchats", requireAuth({secretKey:process.env.CLERK_SECRET_KEY,publishableKey:process.env.CLERK_PUBLISHABLE_KEY,domain:"https://aistrolog-backend.onrender.com/"}), async (req, res,) => {
 
   
     const userId = req.auth.userId;
@@ -94,8 +94,7 @@ app.post("/createchat", requireAuth({signInUrl:'/sign-in'}), async (req, res) =>
   }
 });
 
-app.post("/getchat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, res) => {
-
+app.post("/getchat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
   
   const { chatId } = req.params;
   const userId = req.auth.userId;
@@ -109,8 +108,7 @@ app.post("/getchat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, re
   }
 });
 
-app.put("/updatechat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, res) => {
-
+app.put("/updatechat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
   const { role,parts,chatId } = req.body;
   const userId = req.auth.userId;
   console.log("userIddavam:",userId);
@@ -130,8 +128,7 @@ app.put("/updatechat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, 
 
 
 
-app.delete("/deletechat/:chatId", requireAuth({signInUrl:'/sign-in'}), async (req, res) => {
-
+app.delete("/deletechat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
   const { chatId } = req.params;
   const userId = req.auth.userId;
   try {
