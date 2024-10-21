@@ -36,24 +36,19 @@ const connect = async () => {
 };
 app.use(clerkMiddleware({domain:process.env.CLIENT_URL}))
 
-app.get("/deneme",requireAuth({secretKey:process.env.CLERK_SECRET_KEY,publishableKey:process.env.CLERK_PUBLISHABLE_KEY,domain:"https://aistrolog-backend.onrender.com/"}), async (req, res,) => {
+app.get("/deneme", async (req, res,) => {
 
   res.send("deneme");
 });
 
-app.get('/sign-in', (req, res) => {
-  // Assuming you have a template engine installed and are using a Clerk JavaScript SDK on this page
-  res.redirect(process.env.CLIENT_URL + '/login')
-})
 
-app.get("/getchats", requireAuth({secretKey:process.env.CLERK_SECRET_KEY,publishableKey:process.env.CLERK_PUBLISHABLE_KEY,domain:"https://aistrolog-backend.onrender.com/"}), async (req, res,) => {
+app.get("/getchats",ClerkExpressRequireAuth(), async (req, res,) => {
 
   
     const userId = req.auth.userId;
     if (!userId) {
       return res.status(401).json({ message: "Kullanıcı kimliği doğrulanamadı" });
     }
-  console.log(userId);
   try {
     const userChats = await UserChats.find({ userId: userId });
     res.status(200).json(userChats);
@@ -65,7 +60,7 @@ app.get("/getchats", requireAuth({secretKey:process.env.CLERK_SECRET_KEY,publish
 
 
 
-app.post("/createchat", requireAuth({signInUrl:'/sign-in'}), async (req, res) => {
+app.post("/createchat",ClerkExpressRequireAuth(), async (req, res) => {
 
   const { chatId, title, history } = req.body;
   const userId = req.auth.userId;
@@ -94,24 +89,21 @@ app.post("/createchat", requireAuth({signInUrl:'/sign-in'}), async (req, res) =>
   }
 });
 
-app.post("/getchat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
+app.post("/getchat/:chatId",ClerkExpressRequireAuth(), async (req, res) => {
   
   const { chatId } = req.params;
   const userId = req.auth.userId;
-  console.log("chatId:",chatId);
   try {
     const chat = await Chat.findOne({ chatId: chatId, userId: userId });
-    console.log("chat:",chat);
     res.status(200).json(chat);
   } catch (error) {
     res.status(500).json({ message: "Failed to get chat" });
   }
 });
 
-app.put("/updatechat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
+app.put("/updatechat/:chatId",ClerkExpressRequireAuth(), async (req, res) => {
   const { role,parts,chatId } = req.body;
   const userId = req.auth.userId;
-  console.log("userIddavam:",userId);
   
   try {
     await Chat.findOneAndUpdate(
@@ -128,7 +120,7 @@ app.put("/updatechat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + 
 
 
 
-app.delete("/deletechat/:chatId", requireAuth({signInUrl: process.env.CLIENT_URL + '/sign-in'}), async (req, res) => {
+  app.delete("/deletechat/:chatId",ClerkExpressRequireAuth(), async (req, res) => {
   const { chatId } = req.params;
   const userId = req.auth.userId;
   try {
