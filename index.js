@@ -93,7 +93,6 @@ app.post("/getchat/:chatId",ClerkExpressWithAuth(), async (req, res) => {
   
   const { chatId } = req.params;
   const userId = req.auth.userId;
-  console.log("getchatuserId:" ,userId , "chatId:" ,chatId);
 
   try {
     const chat = await Chat.findOne({ chatId: chatId });
@@ -106,7 +105,6 @@ app.post("/getchat/:chatId",ClerkExpressWithAuth(), async (req, res) => {
 app.put("/updatechat/:chatId",ClerkExpressWithAuth(), async (req, res) => {
   const { role,parts,chatId } = req.body;
   const userId = req.auth.userId;
-  console.log("updatechatuserId:" ,userId , "chatId:" ,chatId);
   try {
     await Chat.findOneAndUpdate(
       { chatId: chatId },
