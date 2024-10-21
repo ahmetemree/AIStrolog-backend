@@ -42,7 +42,7 @@ app.get("/deneme", async (req, res,) => {
 });
 
 
-app.get("/getchats",ClerkExpressRequireAuth(), async (req, res,) => {
+app.get("/getchats",ClerkExpressWithAuth(), async (req, res,) => {
 
   
     const userId = req.auth.userId;
@@ -60,7 +60,7 @@ app.get("/getchats",ClerkExpressRequireAuth(), async (req, res,) => {
 
 
 
-app.post("/createchat",ClerkExpressRequireAuth(), async (req, res) => {
+app.post("/createchat",ClerkExpressWithAuth(), async (req, res) => {
 
   const { chatId, title, history } = req.body;
   const userId = req.auth.userId;
@@ -89,7 +89,7 @@ app.post("/createchat",ClerkExpressRequireAuth(), async (req, res) => {
   }
 });
 
-app.post("/getchat/:chatId",ClerkExpressRequireAuth(), async (req, res) => {
+app.post("/getchat/:chatId",ClerkExpressWithAuth(), async (req, res) => {
   
   const { chatId } = req.params;
   const userId = req.auth.userId;
@@ -101,7 +101,7 @@ app.post("/getchat/:chatId",ClerkExpressRequireAuth(), async (req, res) => {
   }
 });
 
-app.put("/updatechat/:chatId",ClerkExpressRequireAuth(), async (req, res) => {
+app.put("/updatechat/:chatId",ClerkExpressWithAuth(), async (req, res) => {
   const { role,parts,chatId } = req.body;
   const userId = req.auth.userId;
   
@@ -120,7 +120,7 @@ app.put("/updatechat/:chatId",ClerkExpressRequireAuth(), async (req, res) => {
 
 
 
-  app.delete("/deletechat/:chatId",ClerkExpressRequireAuth(), async (req, res) => {
+app.delete("/deletechat/:chatId",ClerkExpressWithAuth(), async (req, res) => {
   const { chatId } = req.params;
   const userId = req.auth.userId;
   try {
