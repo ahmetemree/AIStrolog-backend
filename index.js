@@ -34,18 +34,7 @@ const connect = async () => {
     console.log(err);
   }
 };
-app.use(clerkMiddleware());
-
-// Tüm korumalı rotalar için bir middleware ekleyelim
-const requireAuthMiddleware = (req, res, next) => {
-  if (!req.auth?.userId) {
-    return res.status(401).json({ 
-      message: "Yetkilendirme başarısız. Lütfen giriş yapın.", 
-      error: "AUTH_REQUIRED" 
-    });
-  }
-  next();
-};
+app.use(clerkMiddleware({domain:process.env.CLIENT_URL}))
 
 app.get("/deneme", async (req, res,) => {
 
@@ -53,10 +42,7 @@ app.get("/deneme", async (req, res,) => {
 });
 
 
-app.get("/getchats", 
-  ClerkExpressWithAuth(), 
-  requireAuthMiddleware,
-  async (req, res,) => {
+app.get("/getchats",ClerkExpressWithAuth(), async (req, res,) => {
 
   
     const userId = req.auth.userId;
@@ -74,10 +60,7 @@ app.get("/getchats",
 
 
 
-app.post("/createchat", 
-  ClerkExpressWithAuth(), 
-  requireAuthMiddleware,
-  async (req, res) => {
+app.post("/createchat",ClerkExpressWithAuth(), async (req, res) => {
 
   const { chatId, title, history } = req.body;
   const userId = req.auth.userId;
@@ -106,10 +89,7 @@ app.post("/createchat",
   }
 });
 
-app.post("/getchat/:chatId", 
-  ClerkExpressWithAuth(), 
-  requireAuthMiddleware,
-  async (req, res) => {
+app.post("/getchat/:chatId",ClerkExpressWithAuth(), async (req, res) => {
   
   const { chatId } = req.params;
   const userId = req.auth.userId;
@@ -122,10 +102,7 @@ app.post("/getchat/:chatId",
   }
 });
 
-app.put("/updatechat/:chatId", 
-  ClerkExpressWithAuth(), 
-  requireAuthMiddleware,
-  async (req, res) => {
+app.put("/updatechat/:chatId",ClerkExpressWithAuth(), async (req, res) => {
   const { role,parts,chatId } = req.body;
   const userId = req.auth.userId;
   try {
@@ -143,10 +120,7 @@ app.put("/updatechat/:chatId",
 
 
 
-app.delete("/deletechat/:chatId", 
-  ClerkExpressWithAuth(), 
-  requireAuthMiddleware,
-  async (req, res) => {
+app.delete("/deletechat/:chatId",ClerkExpressWithAuth(), async (req, res) => {
   const { chatId } = req.params;
   const userId = req.auth.userId;
   try {
