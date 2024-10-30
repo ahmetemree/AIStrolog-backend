@@ -8,6 +8,7 @@ import UserChats from "./models/userChat.js";
 import { ClerkExpressRequireAuth, ClerkExpressWithAuth } from '@clerk/clerk-sdk-node'
 import { clerkMiddleware, requireAuth } from '@clerk/express'
 import Chat from "./models/chat.js";
+import userController from "./userController.js"
 const app = express();
 const port = 3002;
 dotenv.config();
@@ -23,6 +24,8 @@ app.use(
     
   })
 );
+
+
 
 app.use(express.json());
 
@@ -41,6 +44,8 @@ app.get("/deneme", async (req, res,) => {
   res.send("deneme");
 });
 
+
+app.use("/user", userController)
 
 app.get("/getchats",ClerkExpressRequireAuth(), async (req, res,) => {
 
