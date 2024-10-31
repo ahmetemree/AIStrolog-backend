@@ -1,25 +1,41 @@
 import express from "express";
 import User from "./models/user.js";
 import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
+import cors from "cors";
 
 const router = express.Router();
+
+router.use(
+    cors({
+      origin: process.env.CLIENT_URL,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      
+    })
+  );
 
 
 router.get("/deneme", async (req, res) => {
     res.send("deneme");
 })
 // Yeni kullanıcı oluşturma
-router.post("/", ClerkExpressRequireAuth(), async (req, res) => {
+router.post("/createuser", ClerkExpressRequireAuth(), async (req, res) => {
     try {
-        const { name, email, birthDate } = req.body;
+        const { name, email, birthDate, birthTime, isFirstTime } = req.body;
         const userId = req.auth.userId;
 
+        console.log(birthTime,"birthTime");
+        console.log(birthDate,"birthDate");
+        
         const newUser = new User({
             name,
+            userId,
             email,
             birthDate,
+            birthTime,
+            isFirstTime: false,
             subscription: "free",
-            subscriptionEndDate: new Date(Date.now() + 30*24*60*60*1000), // 30 gün sonra
+            subscriptionEndDate: "",
             canWeeklySpin: true
         });
 
@@ -31,9 +47,12 @@ router.post("/", ClerkExpressRequireAuth(), async (req, res) => {
 });
 
 // Kullanıcı bilgilerini getirme
-router.get("/:userId", ClerkExpressRequireAuth(), async (req, res) => {
+router.get("/getUserInfo", ClerkExpressRequireAuth(), async (req, res) => {
     try {
-        const user = await User.findOne({ _id: req.params.userId });
+        const userId = req.auth.userId;
+        const user = await User.findOne({ userId: userId });
+        console.log(user,"user");
+        
         if (!user) {
             return res.status(404).json({ message: "Kullanıcı bulunamadı" });
         }

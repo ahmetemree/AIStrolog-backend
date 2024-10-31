@@ -5,6 +5,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    userId: {
+        type: String,
+        required: true
+    },
     email: {
         type: String,
         required: true
@@ -14,7 +18,7 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     birthTime: {
-        type: Date,
+        type: String,
         required: true
     },
     subscription: {
@@ -23,13 +27,21 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     subscriptionEndDate: {
-        type: Date,
-        required: true
+        type: String,
+        required: false
     },
     canWeeklySpin: {
         type: Boolean,
         required: true,
     },
+    isFirstTime: {
+        type: Boolean,
+        required: true,
+    },
+    zodiacSign: {
+        type: String,
+        required: false
+    }
 })
 
 export default mongoose.model("User", userSchema);
