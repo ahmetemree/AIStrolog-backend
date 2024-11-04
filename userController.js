@@ -21,25 +21,48 @@ router.get("/deneme", async (req, res) => {
 // Yeni kullanıcı oluşturma
 router.post("/createuser", ClerkExpressRequireAuth(), async (req, res) => {
     try {
-        const { name, email, birthDate, birthTime, isFirstTime } = req.body;
+        const { name, email, birthDate, birthTime, isFirstTime, zodiacSign, subscription } = req.body;
         const userId = req.auth.userId;
 
         console.log(birthTime,"birthTime");
         console.log(birthDate,"birthDate");
         
-        const newUser = new User({
-            name,
-            userId,
-            email,
-            birthDate,
-            birthTime,
-            isFirstTime: false,
-            subscription: "free",
-            subscriptionEndDate: "",
-            canWeeklySpin: true
-        });
+        const existingUser = await User.findOne({ userId });
+        let savedUser;
+        
+        if (existingUser) {
+            savedUser = await User.findOneAndUpdate(
+                { userId },
+                {
+                    name,
+                    email,
+                    birthDate,
+                    birthTime,
+                    isFirstTime: false,
+                    subscription: existingUser.subscription,
+                    subscriptionEndDate: existingUser.subscriptionEndDate,
+                    canWeeklySpin: existingUser.canWeeklySpin,
+                    zodiacSign: zodiacSign,
+                },
+                { new: true }
+            );
+        } else {
+            const newUser = new User({
+                name,
+                userId,
+                email, 
+                birthDate,
+                birthTime,
+                isFirstTime: false,
+                subscription: subscription,
+                subscriptionEndDate: "",
+                canWeeklySpin: true,
+                zodiacSign: zodiacSign,
+            });
+            savedUser = await newUser.save();
+        }
 
-        const savedUser = await newUser.save();
+        
         res.status(201).json(savedUser);
     } catch (error) {
         res.status(500).json({ message: "Kullanıcı oluşturulamadı", error: error.message });

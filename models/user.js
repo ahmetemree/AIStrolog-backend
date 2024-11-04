@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
     },
     zodiacSign: {
         type: String,
-        required: false
+        required: true,
     }
 })
 
