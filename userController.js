@@ -24,8 +24,6 @@ router.post("/createuser", ClerkExpressRequireAuth(), async (req, res) => {
         const { name, email, birthDate, birthTime, isFirstTime, zodiacSign, subscription } = req.body;
         const userId = req.auth.userId;
 
-        console.log(birthTime,"birthTime");
-        console.log(birthDate,"birthDate");
         
         const existingUser = await User.findOne({ userId });
         let savedUser;
@@ -43,6 +41,7 @@ router.post("/createuser", ClerkExpressRequireAuth(), async (req, res) => {
                     subscriptionEndDate: existingUser.subscriptionEndDate,
                     canWeeklySpin: existingUser.canWeeklySpin,
                     zodiacSign: zodiacSign,
+                    credits: existingUser.credits,
                 },
                 { new: true }
             );
@@ -58,6 +57,7 @@ router.post("/createuser", ClerkExpressRequireAuth(), async (req, res) => {
                 subscriptionEndDate: "",
                 canWeeklySpin: true,
                 zodiacSign: zodiacSign,
+                credits: 5,
             });
             savedUser = await newUser.save();
         }
@@ -69,12 +69,24 @@ router.post("/createuser", ClerkExpressRequireAuth(), async (req, res) => {
     }
 });
 
+router.put("/updatecredits", ClerkExpressRequireAuth(), async (req, res) => {
+    console.log("cannot put");
+    
+    const userId = req.auth.userId;
+    try {
+        const { credits } = req.body;
+        const updatedUser = await User.findOneAndUpdate({ userId }, { credits }, { new: true });
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        res.status(500).json({ message: "Kullanıcı bilgileri güncellenemedi", error: error.message });
+    }
+})
+
 // Kullanıcı bilgilerini getirme
 router.get("/getUserInfo", ClerkExpressRequireAuth(), async (req, res) => {
     try {
         const userId = req.auth.userId;
         const user = await User.findOne({ userId: userId });
-        console.log(user,"user");
         
         if (!user) {
             return res.status(404).json({ message: "Kullanıcı bulunamadı" });
