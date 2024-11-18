@@ -21,9 +21,9 @@ router.get("/deneme", async (req, res) => {
 // Yeni kullanıcı oluşturma
 router.post("/createuser", ClerkExpressRequireAuth(), async (req, res) => {
     try {
-        const { name, email, birthDate, birthTime, isFirstTime, zodiacSign, subscription } = req.body;
+        const { name, email, birthDate, birthTime, isFirstTime, zodiacSign, subscription, birthPlace } = req.body;
         const userId = req.auth.userId;
-
+       
         
         const existingUser = await User.findOne({ userId });
         let savedUser;
@@ -42,6 +42,7 @@ router.post("/createuser", ClerkExpressRequireAuth(), async (req, res) => {
                     canWeeklySpin: existingUser.canWeeklySpin,
                     zodiacSign: zodiacSign,
                     credits: existingUser.credits,
+                    birthPlace: birthPlace
                 },
                 { new: true }
             );
@@ -58,7 +59,8 @@ router.post("/createuser", ClerkExpressRequireAuth(), async (req, res) => {
                 canWeeklySpin: true,
                 zodiacSign: zodiacSign,
                 credits: 5,
-            });
+                birthPlace: birthPlace
+                });
             savedUser = await newUser.save();
         }
 
@@ -68,6 +70,19 @@ router.post("/createuser", ClerkExpressRequireAuth(), async (req, res) => {
         res.status(500).json({ message: "Kullanıcı oluşturulamadı", error: error.message });
     }
 });
+
+router.post("/updatePlan", ClerkExpressRequireAuth(), async (req, res) => {
+    console.log("geldi plan");
+    
+    const { subscription, subscriptionEndDate } = req.body;
+    const userId = req.auth.userId;
+    try {
+        const updatedUser = await User.findOneAndUpdate({ userId }, { subscription, subscriptionEndDate }, { new: true });
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        res.status(500).json({ message: "Kullanıcı planı güncellenemedi", error: error.message });
+    }
+})  
 
 router.put("/updatecredits", ClerkExpressRequireAuth(), async (req, res) => {
     console.log("cannot put");
@@ -97,6 +112,7 @@ router.get("/getUserInfo", ClerkExpressRequireAuth(), async (req, res) => {
     }
 });
 
+
 // Kullanıcı aboneliğini güncelleme
 router.put("/subscription/:userId", ClerkExpressRequireAuth(), async (req, res) => {
     try {
@@ -116,11 +132,13 @@ router.put("/subscription/:userId", ClerkExpressRequireAuth(), async (req, res) 
 });
 
 // Haftalık çark hakkını güncelleme
-router.put("/weeklySpin/:userId", ClerkExpressRequireAuth(), async (req, res) => {
+router.put("/weeklySpin", ClerkExpressRequireAuth(), async (req, res) => {
     try {
+        const userId = req.auth.userId;
         const { canWeeklySpin } = req.body;
-        const updatedUser = await User.findByIdAndUpdate(
-            req.params.userId,
+        console.log(canWeeklySpin, "canWeeklySpin");
+        const updatedUser = await User.findOneAndUpdate(
+            { userId: userId },
             { canWeeklySpin },
             { new: true }
         );
