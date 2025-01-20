@@ -6,7 +6,8 @@ import {
     updateUserCredits,
     getUserInfo,
     updateSubscription,
-    updateWeeklySpin
+    updateWeeklySpin,
+    addUserCredits
 } from '../controller/userController.js';
 
 const router = express.Router();
