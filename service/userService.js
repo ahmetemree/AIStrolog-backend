@@ -53,6 +53,16 @@ class UserService {
     }
 
     async updateUserCredits(userId, credits) {
+        return await User.findOneAndUpdate(
+            { userId }, 
+            { credits }, 
+            { new: true }
+        );
+
+        
+    }
+
+    async addUserCredits(userId, credits) {
         console.log("credits", credits);
         
         // Önce mevcut kullanıcıyı bul

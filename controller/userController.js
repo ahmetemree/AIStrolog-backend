@@ -31,6 +31,15 @@ export const updateUserCredits = async (req, res) => {
     }
 };
 
+export const addUserCredits = async (req, res) => {
+    try {
+        const updatedUser = await userService.addUserCredits(req.auth.userId, req.body.credits);
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        res.status(500).json({ message: "Kullanıcı bilgileri güncellenemedi", error: error.message });
+    }
+};
+
 export const getUserInfo = async (req, res) => {
     try {
         const user = await userService.getUserInfo(req.auth.userId);

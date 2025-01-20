@@ -14,6 +14,7 @@ const router = express.Router();
 router.post("/createuser", requireAuth, createUser);
 router.post("/updatePlan", requireAuth, updateUserPlan);
 router.put("/updatecredits", requireAuth, updateUserCredits);
+router.put("/addcredits", requireAuth, addUserCredits);
 router.get("/getUserInfo", requireAuth, getUserInfo);
 router.put("/subscription/:userId", requireAuth, updateSubscription);
 router.put("/weeklySpin", requireAuth, updateWeeklySpin);
