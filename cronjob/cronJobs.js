@@ -1,7 +1,6 @@
 import cron from 'node-cron';
-import User from './models/user.js';
+import User from '../models/user.js';
 
-// Her pazartesi gece 00:00'da çalışacak cron job
 cron.schedule('0 0 * * 1', async () => {
     try {
         console.log("Cron job çalışıyor: Tüm kullanıcılar için canWeeklySpin güncelleniyor.");
