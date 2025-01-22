@@ -1,4 +1,5 @@
 import User from "../models/user.js";
+import cron from 'node-cron';
 
 class UserService {
     async createOrUpdateUser(userData) {
@@ -77,6 +78,52 @@ class UserService {
             { $inc: { credits: credits } }, // $inc kullanımı daha güvenli
             { new: true }
         );
+    }
+
+    constructor() {
+        // Her ayın 1'inde çalışacak cron job
+        const cronSchedule = '0 0 1 * *'; // Her ayın 1'i saat 00:00'da
+        cron.schedule(cronSchedule, async () => {
+            try {
+                // Free abonelikler için 12 kredi
+                await User.updateMany(
+                    { subscription: 'free' },
+                    { $set: { credits: 12 } }
+                );
+
+                // Plus abonelikler için 200 kredi
+                await User.updateMany(
+                    { subscription: 'plus' },
+                    { $set: { credits: 200 } }
+                );
+
+                // Premium abonelikler için sınırsız (999999) kredi  
+                await User.updateMany(
+                    { subscription: 'premium' },
+                    { $set: { credits: 999999 } }
+                );
+
+                console.log('Aylık kredi güncellemesi başarıyla tamamlandı');
+            } catch (error) {
+                console.error('Aylık kredi güncellemesi sırasında hata:', error);
+            }
+
+            
+        });
+
+        // Her pazartesi günü saat 00:00'da çalışacak cron job
+        cron.schedule('0 0 * * 1', async () => {
+            try {
+                // Tüm kullanıcıların haftalık çark çevirme hakkını true yap
+                await User.updateMany(
+                    {},
+                    { $set: { canWeeklySpin: true } }
+                );
+                console.log('Haftalık çark çevirme hakları başarıyla güncellendi');
+            } catch (error) {
+                console.error('Haftalık çark güncellemesi sırasında hata:', error);
+            }
+        });
     }
 
     async getUserInfo(userId) {
