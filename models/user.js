@@ -9,6 +9,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
     email: {
         type: String,
         required: true
@@ -44,8 +48,13 @@ const userSchema = new mongoose.Schema({
     },
     credits: {
         type: Number,
-        default: 5,
+        default: 12,
         required: true
+    },
+    subscriptionStartDate: {
+        type: Date,
+        required: false,
+        default: Date.now
     },
     birthPlace: {
         type: String,

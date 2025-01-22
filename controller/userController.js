@@ -22,6 +22,7 @@ export const updateUserPlan = async (req, res) => {
     }
 };
 
+
 export const updateUserCredits = async (req, res) => {
     try {
         const updatedUser = await userService.updateUserCredits(req.auth.userId, req.body.credits);
@@ -52,17 +53,7 @@ export const getUserInfo = async (req, res) => {
     }
 };
 
-export const updateSubscription = async (req, res) => {
-    try {
-        const updatedUser = await userService.updateSubscription(req.params.userId, req.body);
-        if (!updatedUser) {
-            return res.status(404).json({ message: "Kullanıcı bulunamadı" });
-        }
-        res.status(200).json(updatedUser);
-    } catch (error) {
-        res.status(500).json({ message: "Abonelik güncellenemedi", error: error.message });
-    }
-};
+
 
 export const updateWeeklySpin = async (req, res) => {
     try {

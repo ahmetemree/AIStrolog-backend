@@ -45,10 +45,10 @@ class UserService {
     }
 
     async updateUserPlan(userId, planData) {
-        const { subscription, subscriptionEndDate } = planData;
+        const { subscription, subscriptionStartDate, subscriptionEndDate, credits } = planData;
         return await User.findOneAndUpdate(
             { userId }, 
-            { subscription, subscriptionEndDate }, 
+            { subscription, subscriptionStartDate, subscriptionEndDate,credits }, 
             { new: true }
         );
     }
@@ -81,34 +81,44 @@ class UserService {
     }
 
     constructor() {
-        // Her ayın 1'inde çalışacak cron job
-        const cronSchedule = '0 0 1 * *'; // Her ayın 1'i saat 00:00'da
-        cron.schedule(cronSchedule, async () => {
+        // Her gün kontrol et
+        cron.schedule('0 0 * * *', async () => {
             try {
-                // Free abonelikler için 12 kredi
-                await User.updateMany(
-                    { subscription: 'free' },
-                    { $set: { credits: 12 } }
-                );
+                const users = await User.find({});
+                
+                for (const user of users) {
+                    if (!user.subscriptionStartDate) continue;
 
-                // Plus abonelikler için 200 kredi
-                await User.updateMany(
-                    { subscription: 'plus' },
-                    { $set: { credits: 200 } }
-                );
-
-                // Premium abonelikler için sınırsız (999999) kredi  
-                await User.updateMany(
-                    { subscription: 'premium' },
-                    { $set: { credits: 999999 } }
-                );
-
-                console.log('Aylık kredi güncellemesi başarıyla tamamlandı');
+                    const nextResetDate = new Date(user.subscriptionStartDate);
+                    nextResetDate.setMonth(nextResetDate.getMonth() + 1);
+                    
+                    const today = new Date();
+                    
+                    // Eğer bugün reset tarihi ise kredileri güncelle
+                    if (today.toDateString() === nextResetDate.toDateString()) {
+                        let newCredits = 12; // varsayılan free credits
+                        
+                        if (user.subscription === 'plus') {
+                            newCredits = 200;
+                        } else if (user.subscription === 'premium') {
+                            newCredits = 999999;
+                        }
+                        
+                        await User.findByIdAndUpdate(user._id, {
+                            $set: { 
+                                credits: newCredits,
+                                subscriptionStartDate: new Date() // Yeni periyot için tarihi güncelle
+                            }
+                        });
+                        
+                        console.log(`${user._id} ID'li kullanıcının kredileri güncellendi: ${newCredits}`);
+                    }
+                }
+                
+                console.log('Günlük kredi kontrolleri tamamlandı');
             } catch (error) {
-                console.error('Aylık kredi güncellemesi sırasında hata:', error);
+                console.error('Kredi güncellemesi sırasında hata:', error);
             }
-
-            
         });
 
         // Her pazartesi günü saat 00:00'da çalışacak cron job
@@ -130,14 +140,7 @@ class UserService {
         return await User.findOne({ userId });
     }
 
-    async updateSubscription(userId, subscriptionData) {
-        const { subscription, subscriptionEndDate } = subscriptionData;
-        return await User.findByIdAndUpdate(
-            userId,
-            { subscription, subscriptionEndDate },
-            { new: true }
-        );
-    }
+    
 
     async updateWeeklySpin(userId, canWeeklySpin) {
         return await User.findOneAndUpdate(
