@@ -80,8 +80,12 @@ class UserService {
         );
     }
 
-    constructor() {
-        // Her gün kontrol et
+
+        
+        
+    
+
+    async getUserInfo(userId) {
         cron.schedule('0 0 * * *', async () => {
             try {
                 const users = await User.find({});
@@ -122,7 +126,7 @@ class UserService {
         });
 
         // Her pazartesi günü saat 00:00'da çalışacak cron job
-        cron.schedule('0 0 * * 1', async () => {
+        cron.schedule('* * * * *', async () => {
             try {
                 // Tüm kullanıcıların haftalık çark çevirme hakkını true yap
                 await User.updateMany(
@@ -134,10 +138,8 @@ class UserService {
                 console.error('Haftalık çark güncellemesi sırasında hata:', error);
             }
         });
-    }
-
-    async getUserInfo(userId) {
         return await User.findOne({ userId });
+        
     }
 
     
